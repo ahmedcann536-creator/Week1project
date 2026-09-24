@@ -1,0 +1,64 @@
+port socket
+import sys
+
+COMMON_PORTS = {
+    21: "FTP",
+    22: "SSH",
+    23: "Telnet",
+    25: "SMTP",
+    53: "DNS",
+    80: "HTTP",
+    110: "POP3",
+    143: "IMAP",
+    443: "HTTPS",
+    3306: "MySQL",
+    3389: "RDP",
+    8080: "HTTP-Proxy"
+}
+
+def scan_port(ip, port):
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        result = sock.connect_ex((ip, port))
+        sock.close()
+
+        return result == 0
+    except socket.error:
+        return False
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python3 port_scanner.py <IP>")
+        sys.exit(1)
+
+    ip = sys.argv[1]
+
+    try:
+        socket.inet_aton(ip)
+    except socket.error:
+        print("Invalid IP address.")
+        sys.exit(1)
+
+    print("=" * 45)
+    print("        AHMEDCANN PORT SCANNER")
+    print("=" * 45)
+    print(f"Scanning target: {ip}")
+    print("-" * 45)
+
+    found = False
+
+    for port, service in COMMON_PORTS.items():
+        if scan_port(ip, port):
+            print(f"[OPEN]  Port {port:<5} | {service}")
+            found = True
+
+    if not found:
+        print("No open common ports found.")
+
+    print("-" * 45)
+    print("Scan complete.")
+    print("=" * 45)
+
+if __name__ == "__main__":
+    main()
